@@ -1,15 +1,15 @@
 terraform {
-  provider "aws" {
+provider "aws" {
     profile       = "default"
     region        = "us-west-2" 
   }
 }
 
-  resource "aws_vpc" "main" {
+resource "aws_vpc" "main" {
   cidr_block      = "10.0.0.0/16"
 }
 
-  locals {
+locals {
   public_cidr     = ["10.0.0.0/24", "10.0.1.0/24"]
   private_cidr    = ["10.0.2.0/24", "10.0.3.0/24"]
 }
@@ -21,7 +21,7 @@ resource "aws_subnet" "public" {
   cidr_block      = local.public_cidr[count.index]
 
   tags            = {
-    Name          = "public${count.index}"
+  Name            = "public${count.index}"
   }
 }
 
@@ -32,7 +32,7 @@ resource "aws_subnet" "private" {
   cidr_block      = local.private_cidr[count.index]
 
   tags            = {
-    Name          = "private${count.index}"
+  Name            = "private${count.index}"
   }
 }
 
@@ -40,7 +40,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id          = aws_vpc.main.id
 
   tags            = {
-    Name          = "main"
+  Name            = "main"
   }
 }
 
@@ -57,7 +57,7 @@ resource "aws_nat_gateway" "main" {
   subnet_id       = aws_subnet.public[count.index].id
 
   tags            = {
-    Name          = "Main gw NAT"
+  Name            = "Main gw NAT"
   }
 
   # To ensure proper ordering, it is recommended to add an explicit dependency
@@ -68,13 +68,13 @@ resource "aws_nat_gateway" "main" {
 resource "aws_route_table" "public" {
   vpc_id          = aws_vpc.main.id
 
-  route {
-    cidr_block    = "0.0.0.0/0"
-    gateway_id    = aws_internet_gateway.main.id
-  }
+route {
+  cidr_block      = "0.0.0.0/0"
+  gateway_id      = aws_internet_gateway.main.id
+}
 
   tags            = {
-    Name          = "public"
+  Name            = "public"
   }
 }
 
